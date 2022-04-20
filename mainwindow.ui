@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1002</width>
-    <height>602</height>
+    <width>1006</width>
+    <height>606</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -57,6 +57,9 @@
                  <height>0</height>
                 </size>
                </property>
+               <property name="cursor">
+                <cursorShape>OpenHandCursor</cursorShape>
+               </property>
               </widget>
              </item>
              <item>
@@ -66,6 +69,9 @@
                  <width>50</width>
                  <height>16777215</height>
                 </size>
+               </property>
+               <property name="cursor">
+                <cursorShape>PointingHandCursor</cursorShape>
                </property>
                <property name="text">
                 <string>刷新</string>
@@ -99,6 +105,9 @@
                    <height>0</height>
                   </size>
                  </property>
+                 <property name="cursor">
+                  <cursorShape>OpenHandCursor</cursorShape>
+                 </property>
                  <property name="currentText">
                   <string/>
                  </property>
@@ -129,6 +138,9 @@
                    <height>0</height>
                   </size>
                  </property>
+                 <property name="cursor">
+                  <cursorShape>OpenHandCursor</cursorShape>
+                 </property>
                 </widget>
                </item>
               </layout>
@@ -142,6 +154,9 @@
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
+             </property>
+             <property name="cursor">
+              <cursorShape>PointingHandCursor</cursorShape>
              </property>
              <property name="text">
               <string>打开串口</string>
@@ -175,6 +190,9 @@
           <layout class="QHBoxLayout" name="horizontalLayout_6">
            <item>
             <widget class="QRadioButton" name="textBtn_S">
+             <property name="cursor">
+              <cursorShape>PointingHandCursor</cursorShape>
+             </property>
              <property name="text">
               <string>文本模式</string>
              </property>
@@ -185,6 +203,9 @@
            </item>
            <item>
             <widget class="QRadioButton" name="hexBtn_S">
+             <property name="cursor">
+              <cursorShape>PointingHandCursor</cursorShape>
+             </property>
              <property name="text">
               <string>Hex模式</string>
              </property>
@@ -194,13 +215,20 @@
          </item>
          <item row="2" column="0">
           <widget class="QPushButton" name="sendBtn">
+           <property name="cursor">
+            <cursorShape>PointingHandCursor</cursorShape>
+           </property>
            <property name="text">
             <string>发送</string>
            </property>
           </widget>
          </item>
          <item row="0" column="0">
-          <widget class="QPlainTextEdit" name="sendTextEdit"/>
+          <widget class="QPlainTextEdit" name="sendTextEdit">
+           <property name="cursor" stdset="0">
+            <cursorShape>IBeamCursor</cursorShape>
+           </property>
+          </widget>
          </item>
         </layout>
        </widget>
@@ -230,12 +258,22 @@
           </attribute>
           <layout class="QGridLayout" name="gridLayout_4">
            <item row="0" column="0">
-            <widget class="QPlainTextEdit" name="reciveTextEdit"/>
+            <widget class="QPlainTextEdit" name="reciveTextEdit">
+             <property name="cursor" stdset="0">
+              <cursorShape>IBeamCursor</cursorShape>
+             </property>
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+            </widget>
            </item>
            <item row="1" column="0">
             <layout class="QHBoxLayout" name="horizontalLayout_7">
              <item>
               <widget class="QRadioButton" name="textBtn_R">
+               <property name="cursor">
+                <cursorShape>PointingHandCursor</cursorShape>
+               </property>
                <property name="text">
                 <string>文本模式</string>
                </property>
@@ -246,6 +284,9 @@
              </item>
              <item>
               <widget class="QRadioButton" name="hexBtn_R">
+               <property name="cursor">
+                <cursorShape>PointingHandCursor</cursorShape>
+               </property>
                <property name="text">
                 <string>Hex模式</string>
                </property>
@@ -269,6 +310,9 @@
        </item>
        <item row="1" column="1">
         <widget class="QPushButton" name="clearBtn">
+         <property name="cursor">
+          <cursorShape>PointingHandCursor</cursorShape>
+         </property>
          <property name="text">
           <string>清空</string>
          </property>
