@@ -1,0 +1,63 @@
+name: MacOS
+on:
+  push:
+    paths-ignore:
+      - '*.md'
+      - 'LICENSE'
+  pull_request:
+    paths-ignore:
+      - '*.md'
+      - 'LICENSE'
+jobs:
+  build:
+    name: Build
+    runs-on: macos-10.15
+
+    steps:
+      #1安装Qt
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v2
+        with:
+          version: '5.15.2'
+          host: 'mac'
+          arch: 'clang_64'
+          modules: qtcharts
+          target: 'desktop'
+      #2拉取代吗
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+      #3编译构建
+      - name: Build
+        run: |
+          qmake
+          make
+      #4打包
+      - name: Package
+        run: |
+          # 拷贝依赖
+          macdeployqt serialPortAssistant.app -qmldir=. -verbose=1 -dmg
+      #5上传artifacts  
+      - name: Upload  artifacts       
+        uses: actions/upload-artifact@v2
+        with:
+          name: serialPortAssistant_MacOS
+          path: serialPortAssistant.app
+      #6打包成zip
+      - name: To zip
+        if: startsWith(github.ref, 'refs/tags')
+        uses: thedoctor0/zip-release@master
+        with:
+          type: 'zip'
+          path: 'serialPortAssistant.app'
+          filename: 'serialPortAssistant_MacOS.zip'
+      #7发布release
+      - name: Upload Release
+        if: startsWith(github.ref, 'refs/tags')
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.TOKEN }}
+          file: serialPortAssistant_MacOS.zip
+          tag: ${{ github.ref }}
+          overwrite: true

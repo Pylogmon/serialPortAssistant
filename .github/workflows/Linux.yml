@@ -1,0 +1,61 @@
+name: Linux
+on:
+  push:
+    paths-ignore:
+      - '*.md'
+      - 'LICENSE'
+  pull_request:
+    paths-ignore:
+      - '*.md'
+      - 'LICENSE'
+
+jobs:
+  #Linux编译
+  Build-Linux:
+    #运行平台
+    name: Build on Linux
+    runs-on: ubuntu-latest
+    #编译步骤
+    steps:
+      #1安装Qt
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v2
+        with:
+          version: '5.15.2'
+          host: 'linux'
+          arch: 'gcc_64'
+          modules: qtcharts
+          target: 'desktop'
+      #2拉取代码
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+      #3编译构建
+      - name: Build
+        run: |
+          qmake
+          make
+      #4打包成zip
+      - name: To zip
+        uses: thedoctor0/zip-release@master
+        with:
+          type: 'zip'
+          path: 'serialPortAssistantserialPortAssistant'
+          filename: 'serialPortAssistant_Linux.zip'
+      #5上传artifact
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: serialPortAssistant_Linux
+          path: /home/runner/work/serialPortAssistant/serialPortAssistant/serialPortAssistant
+          if-no-files-found: error
+      #6发布release
+      - name: Upload Release
+        if: startsWith(github.ref, 'refs/tags')
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.TOKEN }}
+          file: /home/runner/work/serialPortAssistant/serialPortAssistant/serialPortAssistant_Linux.zip
+          tag: ${{ github.ref }}
+          overwrite: true
