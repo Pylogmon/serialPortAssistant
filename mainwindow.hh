@@ -32,7 +32,7 @@ class MainWindow : public QMainWindow
     QChart *chart;
     QChartView *chartView; // chartView实例
     //串口相关
-    QSerialPort *port;               //串口实例
+    QSerialPort *port = nullptr;     //串口实例
     QList<QSerialPortInfo> portList; //端口列表
     //构造析构
     explicit MainWindow(QWidget *parent = nullptr);
@@ -49,7 +49,8 @@ class MainWindow : public QMainWindow
     int closePort();              //关闭串口
     int showLogInfo(QString mag); //打印日志
     int sendMessage();            //发送消息
-    int reciveData();
+    int reciveData();             //接收数据槽函数
+    int saveData();               //保存数据
 
   private:
     Ui::MainWindow *ui;

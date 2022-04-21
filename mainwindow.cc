@@ -9,6 +9,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
 MainWindow::~MainWindow()
 {
+    closePort();
     delete ui;
 }
 
@@ -34,6 +35,8 @@ int MainWindow::initSettings()
     ui->checkBox->addItem("无校验");
     ui->checkBox->addItem("奇校验");
     ui->checkBox->addItem("偶校验");
+    ui->checkBox->addItem("1校验");
+    ui->checkBox->addItem("0校验");
     ui->checkBox->setCurrentIndex(0);
     ui->baudBox->addItem("1200");
     ui->baudBox->addItem("4800");
@@ -43,6 +46,15 @@ int MainWindow::initSettings()
     ui->baudBox->addItem("57600");
     ui->baudBox->addItem("115200");
     ui->baudBox->setCurrentIndex(2);
+    ui->stopBox->addItem("1位");
+    ui->stopBox->addItem("1.5位");
+    ui->stopBox->addItem("2位");
+    ui->stopBox->setCurrentIndex(0);
+    ui->dataBox->addItem("5位");
+    ui->dataBox->addItem("6位");
+    ui->dataBox->addItem("7位");
+    ui->dataBox->addItem("8位");
+    ui->dataBox->setCurrentIndex(3);
     ui->textBtn_R->setChecked(true);
     ui->textBtn_S->setChecked(true);
     ui->closeBtn->setEnabled(false);
@@ -86,6 +98,10 @@ int MainWindow::initConnect()
 
     connect(ui->closeBtn, &QPushButton::clicked, this, &MainWindow::closePort);
 
+    connect(ui->saveBtn, &QPushButton::clicked, this, &MainWindow::saveData);
+
+    connect(ui->qtBtn, &QPushButton::clicked, qApp, &QApplication::aboutQt);
+
     return 0;
 }
 
@@ -97,12 +113,40 @@ int MainWindow::setPort()
     switch (ui->checkBox->currentIndex())
     {
     case 0:
-        port->setParity(QSerialPort::NoParity);
+        port->setParity(QSerialPort::NoParity); //无校验位
     case 1:
-        port->setParity(QSerialPort::OddParity);
+        port->setParity(QSerialPort::OddParity); //奇校验
     case 2:
-        port->setParity(QSerialPort::EvenParity);
+        port->setParity(QSerialPort::EvenParity); //偶校验
+    case 3:
+        port->setParity(QSerialPort::MarkParity); // 1校验
+    case 4:
+        port->setParity(QSerialPort::SpaceParity); // 0校验
     }
+    //设置停止位
+    switch (ui->stopBox->currentIndex())
+    {
+    case 0:
+        port->setStopBits(QSerialPort::OneStop); // 1位停止位
+    case 1:
+        port->setStopBits(QSerialPort::OneAndHalfStop); // 1.5位停止位
+    case 2:
+        port->setStopBits(QSerialPort::TwoStop); //一位停止位
+    }
+    //设置数据位
+    switch (ui->dataBox->currentIndex())
+    {
+    case 0:
+        port->setDataBits(QSerialPort::Data5); //数据位为5位
+    case 1:
+        port->setDataBits(QSerialPort::Data6); //数据位为6位
+    case 2:
+        port->setDataBits(QSerialPort::Data7); //数据位为7位
+    case 3:
+        port->setDataBits(QSerialPort::Data8); //数据位为8位
+    }
+
+    port->setFlowControl(QSerialPort::NoFlowControl); //无流控制
 
     return 0;
 }
@@ -171,9 +215,14 @@ int MainWindow::openPort()
 
 int MainWindow::closePort()
 {
+    if (port == nullptr)
+    {
+        return 1;
+    }
     port->clear();
     port->close();
     delete port;
+    port = nullptr;
 
     ui->comBox->setEnabled(true);
     ui->baudBox->setEnabled(true);
@@ -187,7 +236,7 @@ int MainWindow::closePort()
 
 int MainWindow::sendMessage()
 {
-    if (port == nullptr || !port->isOpen())
+    if (port == nullptr)
     {
         showLogInfo("请先打开串口！");
     }
@@ -204,20 +253,41 @@ int MainWindow::sendMessage()
 int MainWindow::reciveData()
 {
     QByteArray info = port->readAll(); //接收串口信息
+
+    qDebug() << info;
     QByteArray hexData = info.toHex(); //信息转换为16进制
-    // QByteArray textData = info.to
     //打印串口信息
     if (ui->textBtn_R->isChecked())
     {
-        ui->reciveTextEdit->appendPlainText(info);
+        ui->reciveTextEdit->insertPlainText(info + ' ');
     }
     if (ui->hexBtn_R->isChecked())
     {
-        ui->reciveTextEdit->appendPlainText(hexData);
+        for (int i = 0; i < info.length(); i++)
+        {
+            ui->reciveTextEdit->insertPlainText(QString(hexData.at(i * 2)) + QString(hexData.at(i * 2 + 1)) + ' ');
+        }
     }
     return 0;
 }
+int MainWindow::saveData()
+{
+    //弹出窗口获取保存路径
+    QString filename = QFileDialog::getSaveFileName(this, tr("选择保存路径"), "", tr("*.txt"));
+    //打开文件
+    QFile file(filename);
+    file.open(QIODevice::ReadWrite | QIODevice::Text);
+    //获取日志信息
+    QString saveData = ui->reciveTextEdit->toPlainText();
+    //写入日志信息
+    if (file.write(saveData.toUtf8()) > 0)
+    {
+        //弹出成功对话框
+        QMessageBox::information(this, tr("保存日志"), tr("保存成功！"));
+    }
 
+    return 0;
+}
 int MainWindow::showLogInfo(QString msg)
 {
     ui->statusbar->showMessage(msg);
