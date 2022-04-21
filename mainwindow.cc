@@ -204,8 +204,11 @@ int MainWindow::openPort()
         //打印日志信息
         showLogInfo("串口已开启，正在监听串口……");
         ui->comBox->setEnabled(false);
+        ui->refreshBtn->setEnabled(false);
         ui->baudBox->setEnabled(false);
         ui->checkBox->setEnabled(false);
+        ui->dataBox->setEnabled(false);
+        ui->stopBox->setEnabled(false);
         ui->openBtn->setEnabled(false);
         ui->closeBtn->setEnabled(true);
     }
@@ -225,8 +228,11 @@ int MainWindow::closePort()
     port = nullptr;
 
     ui->comBox->setEnabled(true);
+    ui->refreshBtn->setEnabled(true);
     ui->baudBox->setEnabled(true);
     ui->checkBox->setEnabled(true);
+    ui->dataBox->setEnabled(true);
+    ui->stopBox->setEnabled(true);
     ui->openBtn->setEnabled(true);
     ui->closeBtn->setEnabled(false);
 
