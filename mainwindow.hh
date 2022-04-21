@@ -1,5 +1,13 @@
 #pragma once
 
+#ifdef _WIN32
+#define SYS 1
+#elif __linux__
+#define SYS 2
+#elif __APPLE__
+#define SYS 3
+#endif
+
 #include <QChartView>
 #include <QIcon>
 #include <QLineSeries>
@@ -40,6 +48,8 @@ class MainWindow : public QMainWindow
     int openPort();               //打开串口
     int closePort();              //关闭串口
     int showLogInfo(QString mag); //打印日志
+    int sendMessage();            //发送消息
+    int reciveData();
 
   private:
     Ui::MainWindow *ui;
