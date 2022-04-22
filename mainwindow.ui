@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1012</width>
-    <height>612</height>
+    <width>1016</width>
+    <height>616</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,7 +16,7 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout_8">
     <item row="0" column="0">
-     <layout class="QHBoxLayout" name="horizontalLayout_12">
+     <layout class="QHBoxLayout" name="horizontalLayout_14">
       <item>
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
@@ -30,7 +30,7 @@
           <property name="title">
            <string>串口设置</string>
           </property>
-          <layout class="QGridLayout" name="gridLayout">
+          <layout class="QGridLayout" name="gridLayout_7">
            <item row="0" column="0">
             <widget class="QTabWidget" name="tabWidget_2">
              <property name="currentIndex">
@@ -123,7 +123,7 @@
               <attribute name="title">
                <string>高级</string>
               </attribute>
-              <layout class="QGridLayout" name="gridLayout_7">
+              <layout class="QGridLayout" name="gridLayout">
                <item row="0" column="0">
                 <layout class="QHBoxLayout" name="horizontalLayout_5">
                  <item>
@@ -240,6 +240,30 @@
                     </widget>
                    </item>
                   </layout>
+                 </item>
+                </layout>
+               </item>
+               <item row="2" column="0">
+                <layout class="QHBoxLayout" name="horizontalLayout_12">
+                 <item>
+                  <widget class="QCheckBox" name="timeCheckBox">
+                   <property name="text">
+                    <string>添加时间头</string>
+                   </property>
+                   <property name="checked">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QCheckBox" name="newLineCheckBox">
+                   <property name="text">
+                    <string>是否换行</string>
+                   </property>
+                   <property name="checked">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
                  </item>
                 </layout>
                </item>

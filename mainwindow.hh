@@ -16,6 +16,7 @@
 #include <QPushButton>
 #include <QSerialPort>
 #include <QSerialPortInfo>
+#include <QTime>
 #include <QtCharts>
 namespace Ui
 {
@@ -34,6 +35,11 @@ class MainWindow : public QMainWindow
     //串口相关
     QSerialPort *port = nullptr;     //串口实例
     QList<QSerialPortInfo> portList; //端口列表
+    //时间相关
+    int hour;
+    int minute;
+    int second;
+    QString time;
     //构造析构
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
@@ -51,7 +57,7 @@ class MainWindow : public QMainWindow
     int sendMessage();            //发送消息
     int reciveData();             //接收数据槽函数
     int saveData();               //保存数据
-
+    int getTime();                //获取系统时间
   private:
     Ui::MainWindow *ui;
 };

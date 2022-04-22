@@ -265,17 +265,78 @@ int MainWindow::reciveData()
     //打印串口信息
     if (ui->textBtn_R->isChecked())
     {
-        ui->reciveTextEdit->insertPlainText(info + ' ');
+        if (ui->timeCheckBox->isChecked())
+        {
+            getTime();
+            if (ui->newLineCheckBox->isChecked())
+            {
+                ui->reciveTextEdit->appendPlainText(time + info);
+            }
+            else
+            {
+                ui->reciveTextEdit->insertPlainText(time + info + ' ');
+            }
+        }
+        else
+        {
+            if (ui->newLineCheckBox->isChecked())
+            {
+                ui->reciveTextEdit->appendPlainText(info);
+            }
+            else
+            {
+                ui->reciveTextEdit->insertPlainText(info + ' ');
+            }
+        }
     }
     if (ui->hexBtn_R->isChecked())
     {
-        for (int i = 0; i < info.length(); i++)
+        if (ui->timeCheckBox->isChecked())
         {
-            ui->reciveTextEdit->insertPlainText(QString(hexData.at(i * 2)) + QString(hexData.at(i * 2 + 1)) + ' ');
+            getTime();
+            if (ui->newLineCheckBox->isChecked())
+            {
+                ui->reciveTextEdit->appendPlainText(time);
+                for (int i = 0; i < info.length(); i++)
+                {
+                    ui->reciveTextEdit->insertPlainText(QString(hexData.at(i * 2)) + QString(hexData.at(i * 2 + 1)) +
+                                                        ' ');
+                }
+            }
+            else
+            {
+                ui->reciveTextEdit->insertPlainText(time);
+                for (int i = 0; i < info.length(); i++)
+                {
+                    ui->reciveTextEdit->insertPlainText(QString(hexData.at(i * 2)) + QString(hexData.at(i * 2 + 1)) +
+                                                        ' ');
+                }
+            }
+        }
+        else
+        {
+            if (ui->newLineCheckBox->isChecked())
+            {
+                ui->reciveTextEdit->appendPlainText("\n");
+                for (int i = 0; i < info.length(); i++)
+                {
+                    ui->reciveTextEdit->insertPlainText(QString(hexData.at(i * 2)) + QString(hexData.at(i * 2 + 1)) +
+                                                        ' ');
+                }
+            }
+            else
+            {
+                for (int i = 0; i < info.length(); i++)
+                {
+                    ui->reciveTextEdit->insertPlainText(QString(hexData.at(i * 2)) + QString(hexData.at(i * 2 + 1)) +
+                                                        ' ');
+                }
+            }
         }
     }
     return 0;
 }
+
 int MainWindow::saveData()
 {
     //弹出窗口获取保存路径
@@ -294,8 +355,20 @@ int MainWindow::saveData()
 
     return 0;
 }
+
 int MainWindow::showLogInfo(QString msg)
 {
     ui->statusbar->showMessage(msg);
+    return 0;
+}
+
+int MainWindow::getTime()
+{
+    QTime now = QTime::currentTime();
+    int hour = now.hour();
+    int minute = now.minute();
+    int second = now.second();
+    this->time = "[" + QString("%1").arg(hour, 2, 10, QChar('0')) + ":" + QString("%1").arg(minute, 2, 10, QChar('0')) +
+                 ":" + QString("%1").arg(second, 2, 10, QChar('0')) + "] ";
     return 0;
 }
