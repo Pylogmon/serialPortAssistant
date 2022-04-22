@@ -8,16 +8,17 @@
 #define SYS 3
 #endif
 
-#include <QChartView>
+#include <QDebug>
+#include <QFileDialog>
 #include <QIcon>
-#include <QLineSeries>
 #include <QMainWindow>
+#include <QMessageBox>
 #include <QPlainTextEdit>
 #include <QPushButton>
 #include <QSerialPort>
 #include <QSerialPortInfo>
 #include <QTime>
-#include <QtCharts>
+
 namespace Ui
 {
 class MainWindow;
@@ -29,9 +30,9 @@ class MainWindow : public QMainWindow
 
   public:
     //绘图相关
-    QLineSeries *series;
-    QChart *chart;
-    QChartView *chartView; // chartView实例
+    // QLineSeries *series;
+    // QChart *chart;
+    // QChartView *chartView; // chartView实例
     //串口相关
     QSerialPort *port = nullptr;     //串口实例
     QList<QSerialPortInfo> portList; //端口列表

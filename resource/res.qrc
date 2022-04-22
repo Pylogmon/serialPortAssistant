@@ -4,4 +4,7 @@
         <file>img/icon.png</file>
         <file>img/icon.svg</file>
     </qresource>
+    <qresource prefix="/scripts">
+        <file>scripts/gen_img.py</file>
+    </qresource>
 </RCC>
