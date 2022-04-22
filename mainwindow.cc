@@ -17,7 +17,7 @@ int MainWindow::init()
 {
     //设置标题、图标
     this->setWindowTitle("串口小助手");
-    this->setWindowIcon(QIcon(":/img/img/icon.svg"));
+    this->setWindowIcon(QIcon(":/img/img/icon.png"));
     //初始化设置选项
     initSettings();
     //初始化串口
