@@ -23,7 +23,7 @@ int MainWindow::init()
     //初始化串口
     initSerialPort();
     //初始化绘图画布
-    initCharts();
+    // initCharts();
     //初始化信号槽
     initConnect();
     // showLogInfo();
@@ -67,6 +67,7 @@ int MainWindow::initSerialPort()
     return 0;
 }
 
+/*
 int MainWindow::initCharts()
 {
     series = new QLineSeries();
@@ -84,6 +85,7 @@ int MainWindow::initCharts()
 
     return 0;
 }
+*/
 
 int MainWindow::initConnect()
 {

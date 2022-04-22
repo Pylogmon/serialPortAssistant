@@ -44,10 +44,10 @@ class MainWindow : public QMainWindow
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-    int init();                   //软件初始化
-    int initSettings();           //初始化设置
-    int initSerialPort();         //初始化串口
-    int initCharts();             //初始化画布
+    int init();           //软件初始化
+    int initSettings();   //初始化设置
+    int initSerialPort(); //初始化串口
+    // int initCharts();             //初始化画布
     int initConnect();            //初始化信号槽
     int setPort();                //设置串口属性
     int scanPort();               //扫描端口
