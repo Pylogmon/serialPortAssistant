@@ -13,11 +13,14 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+//初始化
 int MainWindow::init()
 {
     //设置标题、图标
     this->setWindowTitle("串口小助手");
-    this->setWindowIcon(QIcon(":/img/img/icon.png"));
+    this->setWindowIcon(QIcon(":/img/img/icon.svg"));
+    //初始化状态栏
+    initStatusBar();
     //初始化设置选项
     initSettings();
     //初始化串口
@@ -26,18 +29,48 @@ int MainWindow::init()
     // initCharts();
     //初始化信号槽
     initConnect();
-    // showLogInfo();
+    //初始化ui
+    initUi();
     return 0;
 }
 
+//初始化状态栏
+int MainWindow::initStatusBar()
+{
+    red = new QLabel;
+    green = new QLabel;
+    opened = new QLabel("串口已打开");
+    closed = new QLabel("串口已关闭");
+
+    red->setStyleSheet(
+        "min-width: 16px; min-height: 16px;max-width:16px; max-height: 16px;border-radius: 8px; background:red");
+    green->setStyleSheet(
+        "min-width: 16px; min-height: 16px;max-width:16px; max-height: 16px;border-radius: 8px; background:green");
+
+    //添加状态栏永久信息
+    ui->statusbar->addPermanentWidget(closed);
+    ui->statusbar->addPermanentWidget(red);
+
+    ui->statusbar->addPermanentWidget(opened);
+    ui->statusbar->addPermanentWidget(green);
+
+    //隐藏串口打开信息
+    opened->hide();
+    green->hide();
+    return 0;
+}
+
+//初始化设置
 int MainWindow::initSettings()
 {
+    //初始化校验位
     ui->checkBox->addItem("无校验");
     ui->checkBox->addItem("奇校验");
     ui->checkBox->addItem("偶校验");
     ui->checkBox->addItem("1校验");
     ui->checkBox->addItem("0校验");
     ui->checkBox->setCurrentIndex(0);
+    //初始化波特率
     ui->baudBox->addItem("1200");
     ui->baudBox->addItem("4800");
     ui->baudBox->addItem("9600");
@@ -46,27 +79,42 @@ int MainWindow::initSettings()
     ui->baudBox->addItem("57600");
     ui->baudBox->addItem("115200");
     ui->baudBox->setCurrentIndex(2);
+    //初始化停止位
     ui->stopBox->addItem("1位");
     ui->stopBox->addItem("1.5位");
     ui->stopBox->addItem("2位");
     ui->stopBox->setCurrentIndex(0);
+    //初始化数据位
     ui->dataBox->addItem("5位");
     ui->dataBox->addItem("6位");
     ui->dataBox->addItem("7位");
     ui->dataBox->addItem("8位");
     ui->dataBox->setCurrentIndex(3);
+    //初始化文本模式
     ui->textBtn_R->setChecked(true);
     ui->textBtn_S->setChecked(true);
+    //禁用关闭串口
     ui->closeBtn->setEnabled(false);
     return 0;
 }
 
+//初始化串口
 int MainWindow::initSerialPort()
 {
     scanPort();
     return 0;
 }
 
+//初始化ui
+int MainWindow::initUi()
+{
+    // lineEdit添加输入字符限制
+    QRegExp regx("([A-Fa-f0-9]{2}[ ]){" + QString::number(ui->dataBox->currentIndex() + 4) + "}[A-Fa-f0-9]{2}");
+    QValidator *validator = new QRegExpValidator(regx, ui->lineEdit);
+    ui->lineEdit->setValidator(validator);
+    changeTextEdit();
+    return 0;
+}
 /*
 int MainWindow::initCharts()
 {
@@ -87,26 +135,32 @@ int MainWindow::initCharts()
 }
 */
 
+//初始化信号槽
 int MainWindow::initConnect()
 {
     //清空接收区
     connect(ui->clearBtn, &QPushButton::clicked, ui->reciveTextEdit, &QPlainTextEdit::clear);
     //刷新端口列表
     connect(ui->refreshBtn, &QPushButton::clicked, this, &MainWindow::scanPort);
-
+    //发送信息
     connect(ui->sendBtn, &QPushButton::clicked, this, &MainWindow::sendMessage);
-
+    //打开串口
     connect(ui->openBtn, &QPushButton::clicked, this, &MainWindow::openPort);
-
+    //关闭串口
     connect(ui->closeBtn, &QPushButton::clicked, this, &MainWindow::closePort);
-
+    //保存数据
     connect(ui->saveBtn, &QPushButton::clicked, this, &MainWindow::saveData);
-
+    //关于Qt
     connect(ui->qtBtn, &QPushButton::clicked, qApp, &QApplication::aboutQt);
-
+    //切换编辑器
+    connect(ui->textBtn_S, &QRadioButton::clicked, this, &MainWindow::changeTextEdit);
+    connect(ui->hexBtn_S, &QRadioButton::clicked, this, &MainWindow::changeTextEdit);
+    //设置编辑器限制
+    connect(ui->dataBox, &QComboBox::currentTextChanged, this, &MainWindow::initUi);
     return 0;
 }
 
+//设置串口
 int MainWindow::setPort()
 {
     port->setBaudRate(ui->baudBox->currentText().toInt());  //设置波特率
@@ -153,6 +207,7 @@ int MainWindow::setPort()
     return 0;
 }
 
+//扫描可用端口
 int MainWindow::scanPort()
 {
     ui->comBox->clear(); //清空下拉菜单
@@ -169,6 +224,7 @@ int MainWindow::scanPort()
     return 0;
 }
 
+//打开串口
 int MainWindow::openPort()
 {
     port = new QSerialPort;
@@ -205,6 +261,7 @@ int MainWindow::openPort()
         connect(port, &QSerialPort::readyRead, this, &MainWindow::reciveData);
         //打印日志信息
         showLogInfo("串口已开启，正在监听串口……");
+        //串口打开后禁用设置项
         ui->comBox->setEnabled(false);
         ui->refreshBtn->setEnabled(false);
         ui->baudBox->setEnabled(false);
@@ -213,22 +270,29 @@ int MainWindow::openPort()
         ui->stopBox->setEnabled(false);
         ui->openBtn->setEnabled(false);
         ui->closeBtn->setEnabled(true);
+        //切换状态栏永久显示模块
+        opened->show();
+        green->show();
+        closed->hide();
+        red->hide();
     }
-
     return 0;
 }
 
+//关闭串口
 int MainWindow::closePort()
 {
+    //判断串口实例是否存在
     if (port == nullptr)
     {
         return 1;
     }
+    //关闭串口
     port->clear();
     port->close();
     delete port;
     port = nullptr;
-
+    //串口设置可用
     ui->comBox->setEnabled(true);
     ui->refreshBtn->setEnabled(true);
     ui->baudBox->setEnabled(true);
@@ -237,65 +301,112 @@ int MainWindow::closePort()
     ui->stopBox->setEnabled(true);
     ui->openBtn->setEnabled(true);
     ui->closeBtn->setEnabled(false);
+    //切换状态栏永久显示模块
+    closed->show();
+    red->show();
+    opened->hide();
+    green->hide();
 
     showLogInfo("串口已关闭！");
     return 0;
 }
 
+//发送串口数据
 int MainWindow::sendMessage()
 {
+    //检查串口状态
     if (port == nullptr)
     {
         showLogInfo("请先打开串口！");
     }
     else
     {
-        if (port->write(ui->sendTextEdit->toPlainText().toUtf8()))
+        //检查text模式还是hex模式
+        if (ui->textBtn_S->isChecked())
         {
-            showLogInfo("发送成功！");
+            if (port->write(ui->sendTextEdit->toPlainText().toUtf8()))
+            {
+                showLogInfo("发送成功！");
+            }
+        }
+        else
+        {
+            //构造16进制数据
+            QByteArray dataPart;
+            QStringList hexData = ui->lineEdit->text().split(" ");
+            //检查数据位数
+            if (hexData.length() != (ui->dataBox->currentIndex() + 5))
+            {
+                ui->statusbar->showMessage("数据位数不足！");
+                return -1;
+            }
+            foreach (QString s, hexData)
+            {
+                dataPart.append(QByteArray::fromHex(s.toLatin1()));
+            }
+            if (port->write(dataPart))
+            {
+                showLogInfo("发送成功！");
+            }
         }
     }
     return 0;
 }
 
+//接收串口数据
 int MainWindow::reciveData()
 {
     QByteArray info = port->readAll(); //接收串口信息
+    //状态栏信息
+    ui->statusbar->showMessage("接收到" + QString::number(info.length()) + "Byte数据");
 
-    qDebug() << info;
-    QByteArray hexData = info.toHex(); //信息转换为16进制
     //打印串口信息
+    //检查text模式还是hex模式
+    // text模式
     if (ui->textBtn_R->isChecked())
     {
+        //检查是否加时间头
+        //加时间头
         if (ui->timeCheckBox->isChecked())
         {
+            //获取系统时间
             getTime();
+            //检查是否换行
+            //换行
             if (ui->newLineCheckBox->isChecked())
             {
                 ui->reciveTextEdit->appendPlainText(time + info);
             }
+            //不换行
             else
             {
                 ui->reciveTextEdit->insertPlainText(time + info + ' ');
             }
         }
+        //不加时间头
         else
         {
+            //换行
             if (ui->newLineCheckBox->isChecked())
             {
                 ui->reciveTextEdit->appendPlainText(info);
             }
+            //不换行
             else
             {
                 ui->reciveTextEdit->insertPlainText(info + ' ');
             }
         }
     }
+    // hex模式
     if (ui->hexBtn_R->isChecked())
     {
+        QByteArray hexData = info.toHex(); //信息转换为16进制
+        //加时间头
         if (ui->timeCheckBox->isChecked())
         {
             getTime();
+            //换行
             if (ui->newLineCheckBox->isChecked())
             {
                 ui->reciveTextEdit->appendPlainText(time);
@@ -305,6 +416,7 @@ int MainWindow::reciveData()
                                                         ' ');
                 }
             }
+            //不换行
             else
             {
                 ui->reciveTextEdit->insertPlainText(time);
@@ -315,8 +427,10 @@ int MainWindow::reciveData()
                 }
             }
         }
+        //不加时间头
         else
         {
+            //换行
             if (ui->newLineCheckBox->isChecked())
             {
                 ui->reciveTextEdit->appendPlainText("\n");
@@ -326,6 +440,7 @@ int MainWindow::reciveData()
                                                         ' ');
                 }
             }
+            //不换行
             else
             {
                 for (int i = 0; i < info.length(); i++)
@@ -339,6 +454,7 @@ int MainWindow::reciveData()
     return 0;
 }
 
+//保存数据
 int MainWindow::saveData()
 {
     //弹出窗口获取保存路径
@@ -352,25 +468,48 @@ int MainWindow::saveData()
     if (file.write(saveData.toUtf8()) > 0)
     {
         //弹出成功对话框
-        QMessageBox::information(this, tr("保存日志"), tr("保存成功！"));
+        QMessageBox::information(this, tr("保存数据"), tr("保存成功！"));
     }
 
     return 0;
 }
 
+//状态栏打印信息
 int MainWindow::showLogInfo(QString msg)
 {
     ui->statusbar->showMessage(msg);
     return 0;
 }
 
+//获取当前系统时间
 int MainWindow::getTime()
 {
     QTime now = QTime::currentTime();
-    int hour = now.hour();
-    int minute = now.minute();
-    int second = now.second();
-    this->time = "[" + QString("%1").arg(hour, 2, 10, QChar('0')) + ":" + QString("%1").arg(minute, 2, 10, QChar('0')) +
-                 ":" + QString("%1").arg(second, 2, 10, QChar('0')) + "] ";
+    //格式化字符串，两位数字，不足补0
+    QString hour = QString("%1").arg(now.hour(), 2, 10, QChar('0'));
+    QString minute = QString("%1").arg(now.minute(), 2, 10, QChar('0'));
+    QString second = QString("%1").arg(now.second(), 2, 10, QChar('0'));
+    // int hour = now.hour();
+    // int minute = now.minute();
+    // int second = now.second();
+    this->time = "[" + hour + ":" + minute + ":" + second + "] ";
+    return 0;
+}
+
+//切换编辑器
+int MainWindow::changeTextEdit()
+{
+    // text模式
+    if (ui->textBtn_S->isChecked())
+    {
+        ui->lineEdit->hide();
+        ui->sendTextEdit->show();
+    }
+    // hex模式
+    else
+    {
+        ui->lineEdit->show();
+        ui->sendTextEdit->hide();
+    }
     return 0;
 }

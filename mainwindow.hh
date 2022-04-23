@@ -1,5 +1,6 @@
 #pragma once
 
+//系统标识符
 #ifdef _WIN32
 #define SYS 1
 #elif __linux__
@@ -29,6 +30,11 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
   public:
+    //状态栏相关
+    QLabel *opened;
+    QLabel *closed;
+    QLabel *red;
+    QLabel *green;
     //绘图相关
     // QLineSeries *series;
     // QChart *chart;
@@ -40,16 +46,18 @@ class MainWindow : public QMainWindow
     int hour;
     int minute;
     int second;
-    QString time;
+    QString time; //时间头格式化字符串
     //构造析构
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
     int init();           //软件初始化
+    int initStatusBar();  //初始化状态栏
     int initSettings();   //初始化设置
     int initSerialPort(); //初始化串口
     // int initCharts();             //初始化画布
-    int initConnect();            //初始化信号槽
+    int initConnect(); //初始化信号槽
+    int initUi();
     int setPort();                //设置串口属性
     int scanPort();               //扫描端口
     int openPort();               //打开串口
@@ -59,6 +67,7 @@ class MainWindow : public QMainWindow
     int reciveData();             //接收数据槽函数
     int saveData();               //保存数据
     int getTime();                //获取系统时间
+    int changeTextEdit();         //切换输入框
   private:
     Ui::MainWindow *ui;
 };
