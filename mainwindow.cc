@@ -90,6 +90,12 @@ int MainWindow::initSettings()
     ui->dataBox->addItem("7位");
     ui->dataBox->addItem("8位");
     ui->dataBox->setCurrentIndex(3);
+
+    //设置可选选项
+    ui->timeCheckBox->setChecked(true);
+    ui->newLineCheckBox->setChecked(true);
+    ui->realTimecheckBox->setChecked(false);
+
     //初始化文本模式
     ui->textBtn_R->setChecked(true);
     ui->textBtn_S->setChecked(true);
@@ -109,10 +115,11 @@ int MainWindow::initSerialPort()
 int MainWindow::initUi()
 {
     // lineEdit添加输入字符限制
-    QRegExp regx("([A-Fa-f0-9]{2}[ ]){" + QString::number(ui->dataBox->currentIndex() + 4) + "}[A-Fa-f0-9]{2}");
+    QRegExp regx("([A-Fa-f0-9]{2}[ ]){0,100}[A-Fa-f0-9]{2}");
     QValidator *validator = new QRegExpValidator(regx, ui->lineEdit);
     ui->lineEdit->setValidator(validator);
     changeTextEdit();
+    setRealTime();
     return 0;
 }
 /*
@@ -157,6 +164,10 @@ int MainWindow::initConnect()
     connect(ui->hexBtn_S, &QRadioButton::clicked, this, &MainWindow::changeTextEdit);
     //设置编辑器限制
     connect(ui->dataBox, &QComboBox::currentTextChanged, this, &MainWindow::initUi);
+    //设置实时保存文件可用性
+    connect(ui->realTimecheckBox, &QCheckBox::clicked, this, &MainWindow::setRealTime);
+
+    connect(ui->browseBtn, &QPushButton::clicked, this, &MainWindow::getPath);
     return 0;
 }
 
@@ -228,14 +239,15 @@ int MainWindow::scanPort()
 int MainWindow::openPort()
 {
     port = new QSerialPort;
-    setPort();
+
     //检查可用端口
-    if (portList.size() == 0)
+    if (ui->comBox->count() == 0)
     {
         showLogInfo("无可用端口！，请刷新端口信息");
     }
     else
     {
+        setPort();
         //如果串口已经打开，则先关闭串口
         if (port->isOpen())
         {
@@ -254,6 +266,8 @@ int MainWindow::openPort()
         {
             //打开失败，打印日志信息
             showLogInfo("串口打开失败，请检查端口信息！");
+            delete port;
+            port = nullptr;
             return -1;
         }
 
@@ -334,16 +348,12 @@ int MainWindow::sendMessage()
             //构造16进制数据
             QByteArray dataPart;
             QStringList hexData = ui->lineEdit->text().split(" ");
-            //检查数据位数
-            if (hexData.length() != (ui->dataBox->currentIndex() + 5))
-            {
-                ui->statusbar->showMessage("数据位数不足！");
-                return -1;
-            }
+
             foreach (QString s, hexData)
             {
                 dataPart.append(QByteArray::fromHex(s.toLatin1()));
             }
+
             if (port->write(dataPart))
             {
                 showLogInfo("发送成功！");
@@ -451,6 +461,18 @@ int MainWindow::reciveData()
             }
         }
     }
+    if (ui->realTimecheckBox->isChecked())
+    {
+        if (ui->pathEdit->text().isEmpty())
+        {
+            ui->realTimecheckBox->setChecked(false);
+            showLogInfo("未设置文件路径，已关闭实时保存！");
+        }
+        else
+        {
+            realTimeSaveData(ui->pathEdit->text());
+        }
+    }
     return 0;
 }
 
@@ -458,7 +480,7 @@ int MainWindow::reciveData()
 int MainWindow::saveData()
 {
     //弹出窗口获取保存路径
-    QString filename = QFileDialog::getSaveFileName(this, tr("选择保存路径"), "", tr("*.txt"));
+    QString filename = QFileDialog::getSaveFileName(this, tr("选择保存路径"), "");
     //打开文件
     QFile file(filename);
     file.open(QIODevice::ReadWrite | QIODevice::Text);
@@ -469,6 +491,22 @@ int MainWindow::saveData()
     {
         //弹出成功对话框
         QMessageBox::information(this, tr("保存数据"), tr("保存成功！"));
+    }
+
+    return 0;
+}
+
+//实时保存数据
+int MainWindow::realTimeSaveData(QString path)
+{
+    QFile file(path);
+    file.open(QIODevice::ReadWrite | QIODevice::Text);
+    //获取数据信息
+    QString saveData = ui->reciveTextEdit->toPlainText();
+    //写入数据信息
+    if (!file.write(saveData.toUtf8()))
+    {
+        showLogInfo("数据实时写入失败！");
     }
 
     return 0;
@@ -511,5 +549,29 @@ int MainWindow::changeTextEdit()
         ui->lineEdit->show();
         ui->sendTextEdit->hide();
     }
+    return 0;
+}
+
+int MainWindow::setRealTime()
+{
+    if (ui->realTimecheckBox->isChecked())
+    {
+        ui->pathEdit->setEnabled(true);
+        ui->browseBtn->setEnabled(true);
+    }
+    else
+    {
+        ui->pathEdit->setEnabled(false);
+        ui->browseBtn->setEnabled(false);
+    }
+    return 0;
+}
+
+int MainWindow::getPath()
+{
+    //弹出窗口获取保存路径
+    QString fileName = QFileDialog::getSaveFileName(this, tr("选择输出路径"), "");
+
+    ui->pathEdit->setText(fileName);
     return 0;
 }

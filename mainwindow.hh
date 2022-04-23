@@ -58,16 +58,19 @@ class MainWindow : public QMainWindow
     // int initCharts();             //初始化画布
     int initConnect(); //初始化信号槽
     int initUi();
-    int setPort();                //设置串口属性
-    int scanPort();               //扫描端口
-    int openPort();               //打开串口
-    int closePort();              //关闭串口
-    int showLogInfo(QString mag); //打印日志
-    int sendMessage();            //发送消息
-    int reciveData();             //接收数据槽函数
-    int saveData();               //保存数据
-    int getTime();                //获取系统时间
-    int changeTextEdit();         //切换输入框
+    int setPort();                      //设置串口属性
+    int scanPort();                     //扫描端口
+    int openPort();                     //打开串口
+    int closePort();                    //关闭串口
+    int showLogInfo(QString mag);       //打印日志
+    int sendMessage();                  //发送消息
+    int reciveData();                   //接收数据槽函数
+    int saveData();                     //保存数据
+    int realTimeSaveData(QString path); //实时保存数据
+    int getTime();                      //获取系统时间
+    int changeTextEdit();               //切换输入框
+    int setRealTime();                  //设置是否实时写入文件
+    int getPath();                      //获取文件路径
   private:
     Ui::MainWindow *ui;
 };
