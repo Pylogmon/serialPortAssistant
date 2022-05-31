@@ -115,8 +115,8 @@ int MainWindow::initSerialPort()
 int MainWindow::initUi()
 {
     // lineEdit添加输入字符限制
-    QRegExp regx("([A-Fa-f0-9]{2}[ ]){0,100}[A-Fa-f0-9]{2}");
-    QValidator *validator = new QRegExpValidator(regx, ui->lineEdit);
+    QRegularExpression regHex("([A-Fa-f0-9]{2}[ ]){0,100}[A-Fa-f0-9]{2}");
+    auto *validator = new QRegularExpressionValidator(regHex, ui->lineEdit);
     ui->lineEdit->setValidator(validator);
     changeTextEdit();
     setRealTime();
@@ -272,7 +272,7 @@ int MainWindow::openPort()
         }
 
         //连接下位机发送信号
-        connect(port, &QSerialPort::readyRead, this, &MainWindow::reciveData);
+        connect(port, &QSerialPort::readyRead, this, &MainWindow::receiveData);
         //打印日志信息
         showLogInfo("串口已开启，正在监听串口……");
         //串口打开后禁用设置项
@@ -364,7 +364,7 @@ int MainWindow::sendMessage()
 }
 
 //接收串口数据
-int MainWindow::reciveData()
+int MainWindow::receiveData()
 {
     QByteArray info = port->readAll(); //接收串口信息
     //状态栏信息
@@ -497,7 +497,7 @@ int MainWindow::saveData()
 }
 
 //实时保存数据
-int MainWindow::realTimeSaveData(QString path)
+int MainWindow::realTimeSaveData(const QString& path)
 {
     QFile file(path);
     file.open(QIODevice::ReadWrite | QIODevice::Text);
@@ -513,7 +513,7 @@ int MainWindow::realTimeSaveData(QString path)
 }
 
 //状态栏打印信息
-int MainWindow::showLogInfo(QString msg)
+int MainWindow::showLogInfo(const QString& msg)
 {
     ui->statusbar->showMessage(msg);
     return 0;
