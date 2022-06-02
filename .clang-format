@@ -1,0 +1,4 @@
+# Generated from CLion C/C++ Code Style settings
+BasedOnStyle: Microsoft
+TabWidth: 4
+UseTab: Never
