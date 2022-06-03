@@ -1,7 +1,7 @@
 #pragma once
 
 //系统标识符
-#ifdef _WIN32_
+#ifdef __WIN32__
 #define SYS 1
 #elif __linux__
 #define SYS 2
