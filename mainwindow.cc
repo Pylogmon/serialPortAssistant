@@ -181,36 +181,48 @@ int MainWindow::setPort()
 	{
 	case 0:
 		port->setParity(QSerialPort::NoParity); //无校验位
+        break;
 	case 1:
 		port->setParity(QSerialPort::OddParity); //奇校验
+        break;
 	case 2:
 		port->setParity(QSerialPort::EvenParity); //偶校验
+        break;
 	case 3:
 		port->setParity(QSerialPort::MarkParity); // 1校验
+        break;
 	case 4:
 		port->setParity(QSerialPort::SpaceParity); // 0校验
+        break;
 	}
 	//设置停止位
 	switch (ui->stopBox->currentIndex())
 	{
 	case 0:
 		port->setStopBits(QSerialPort::OneStop); // 1位停止位
+        break;
 	case 1:
 		port->setStopBits(QSerialPort::OneAndHalfStop); // 1.5位停止位
+        break;
 	case 2:
 		port->setStopBits(QSerialPort::TwoStop); //一位停止位
+        break;
 	}
 	//设置数据位
 	switch (ui->dataBox->currentIndex())
 	{
 	case 0:
 		port->setDataBits(QSerialPort::Data5); //数据位为5位
+        break;
 	case 1:
 		port->setDataBits(QSerialPort::Data6); //数据位为6位
+        break;
 	case 2:
 		port->setDataBits(QSerialPort::Data7); //数据位为7位
+        break;
 	case 3:
 		port->setDataBits(QSerialPort::Data8); //数据位为8位
+        break;
 	}
 
 	port->setFlowControl(QSerialPort::NoFlowControl); //无流控制
@@ -370,97 +382,33 @@ int MainWindow::receiveData()
 	//状态栏信息
 	ui->statusbar->showMessage("接收到" + QString::number(info.length()) + "Byte数据");
 
-	//打印串口信息
-	//检查text模式还是hex模式
-	// text模式
-	if (ui->textBtn_R->isChecked())
-	{
-		//检查是否加时间头
-		//加时间头
-		if (ui->timeCheckBox->isChecked())
-		{
-			//获取系统时间
-			getTime();
-			//检查是否换行
-			//换行
-			if (ui->newLineCheckBox->isChecked())
-			{
-				ui->reciveTextEdit->appendPlainText(time + info);
-			}
-				//不换行
-			else
-			{
-				ui->reciveTextEdit->insertPlainText(time + info + ' ');
-			}
-		}
-			//不加时间头
-		else
-		{
-			//换行
-			if (ui->newLineCheckBox->isChecked())
-			{
-				ui->reciveTextEdit->appendPlainText(info);
-			}
-				//不换行
-			else
-			{
-				ui->reciveTextEdit->insertPlainText(info + ' ');
-			}
-		}
-	}
-	// hex模式
-	if (ui->hexBtn_R->isChecked())
-	{
-		QByteArray hexData = info.toHex(); //信息转换为16进制
-		//加时间头
-		if (ui->timeCheckBox->isChecked())
-		{
-			getTime();
-			//换行
-			if (ui->newLineCheckBox->isChecked())
-			{
-				ui->reciveTextEdit->appendPlainText(time);
-				for (int i = 0; i < info.length(); i++)
-				{
-					ui->reciveTextEdit->insertPlainText(QString(hexData.at(i * 2)) + QString(hexData.at(i * 2 + 1)) +
-														' ');
-				}
-			}
-				//不换行
-			else
-			{
-				ui->reciveTextEdit->insertPlainText(time);
-				for (int i = 0; i < info.length(); i++)
-				{
-					ui->reciveTextEdit->insertPlainText(QString(hexData.at(i * 2)) + QString(hexData.at(i * 2 + 1)) +
-														' ');
-				}
-			}
-		}
-			//不加时间头
-		else
-		{
-			//换行
-			if (ui->newLineCheckBox->isChecked())
-			{
-				ui->reciveTextEdit->appendPlainText("\n");
-				for (int i = 0; i < info.length(); i++)
-				{
-					ui->reciveTextEdit->insertPlainText(QString(hexData.at(i * 2)) + QString(hexData.at(i * 2 + 1)) +
-														' ');
-				}
-			}
-				//不换行
-			else
-			{
-				for (int i = 0; i < info.length(); i++)
-				{
-					ui->reciveTextEdit->insertPlainText(QString(hexData.at(i * 2)) + QString(hexData.at(i * 2 + 1)) +
-														' ');
-				}
-			}
-		}
-	}
+    this->time.clear();
+    QString end="";
+    //获取时间
+    if (ui->timeCheckBox->isChecked())
+    {
+        getTime();
+    }
+    //是否换行
+    if(ui->newLineCheckBox->isChecked()){
+        end="\n";
+    }
+    //文本模式
+    if (ui->textBtn_R->isChecked())
+    {
+        ui->reciveTextEdit->insertPlainText(time + info + end);
+    }
+    //Hex模式
+    else{
+        QByteArray hexData = info.toHex(); //信息转换为16进制
+        ui->reciveTextEdit->insertPlainText(time);
+        for (int i = 0; i < info.length(); i++)
+        {
+            ui->reciveTextEdit->insertPlainText(QString(hexData.at(i * 2)) + QString(hexData.at(i * 2 + 1)) + " ");
+        }
+        ui->reciveTextEdit->insertPlainText(end);
+    }
+    //实时写入文件
 	if (ui->realTimecheckBox->isChecked())
 	{
 		if (ui->pathEdit->text().isEmpty())
