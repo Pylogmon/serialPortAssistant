@@ -378,7 +378,8 @@ int MainWindow::sendMessage()
 //接收串口数据
 int MainWindow::receiveData()
 {
-    QByteArray info = port->readAll(); //接收串口信息
+    while(port->bytesAvailable()>0){
+    QByteArray info = port->read(8); //接收串口信息
     //状态栏信息
     ui->statusbar->showMessage("接收到" + QString::number(info.length()) + "Byte数据");
 
@@ -422,6 +423,7 @@ int MainWindow::receiveData()
         {
             realTimeSaveData(ui->pathEdit->text());
         }
+    }
     }
     return 0;
 }
